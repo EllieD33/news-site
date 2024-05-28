@@ -70,3 +70,26 @@ describe('/api/articles/:article_id', () => {
             })
     });
 });
+
+describe('/api/articles', () => {
+    test('GET:200 responds with an articles array of article objects', () => {
+        return request(app)
+            .get('/api/articles')
+            .expect(200)
+            .then((response) => {
+                expect(response.body.articles.length).toBe(13);
+                response.body.articles.forEach((article) => {
+                    expect(article).toEqual({
+                        article_id: expect.any(Number),
+                        author: expect.any(String),
+                        title: expect.any(String),
+                        topic: expect.any(String),
+                        created_at: expect.any(String),
+                        article_img_url: expect.any(String),
+                        votes: expect.any(Number),
+                        comment_count: expect.any(Number)
+                    })
+                })
+            })
+    });
+});
