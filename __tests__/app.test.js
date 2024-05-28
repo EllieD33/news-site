@@ -41,7 +41,8 @@ describe('/api/articles/:article_id', () => {
             .get('/api/articles/5')
             .expect(200)
             .then((response) => {
-                expect(response.body.article).toEqual({
+                expect(response.body.article.article_id).toBe(5)
+                expect(response.body.article).toEqual(expect.objectContaining({
                     article_id: expect.any(Number),
                     author: expect.any(String),
                     title: expect.any(String),
@@ -50,7 +51,7 @@ describe('/api/articles/:article_id', () => {
                     created_at: expect.any(String),
                     votes: expect.any(Number),
                     article_img_url: expect.any(String)
-                })
+                }))
             })
     });
     test('GET:404 responds with error message when id does not exist', () => {
@@ -67,6 +68,46 @@ describe('/api/articles/:article_id', () => {
             .expect(400)
             .then((response) => {
                 expect(response.body.msg).toBe('Bad request');
+            })
+    });
+});
+
+describe('/api/articles', () => {
+    test('GET:200 responds with an articles array of article objects', () => {
+        return request(app)
+            .get('/api/articles')
+            .expect(200)
+            .then((response) => {
+                expect(response.body.articles.length).toBe(13);
+                response.body.articles.forEach((article) => {
+                    expect(article).toEqual({
+                        article_id: expect.any(Number),
+                        author: expect.any(String),
+                        title: expect.any(String),
+                        topic: expect.any(String),
+                        created_at: expect.any(String),
+                        article_img_url: expect.any(String),
+                        votes: expect.any(Number),
+                        comment_count: expect.any(Number)
+                    })
+                })
+            })
+    });
+    test('GET:200 served array is sorted by date in descending order by default', () => {
+        return request(app)
+            .get('/api/articles')
+            .expect(200)
+            .then((response) => {
+                expect(response.body.articles).toBeSortedBy('created_at', { descending: true})
+            })
+    });
+    test('GET:200 correctly counts comments', () => {
+        return request(app)
+            .get('/api/articles')
+            .expect(200)
+            .then((response) => {
+                expect(response.body.articles[7].comment_count).toBe(2)
+                expect(response.body.articles[9].comment_count).toBe(0)
             })
     });
 });
