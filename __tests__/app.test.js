@@ -30,7 +30,7 @@ describe('/api', () => {
             .get('/api')
             .expect(200)
             .then((response) => {
-                expect(response.body).toEqual(endpoints);
+                expect(response.body.endpoints).toEqual(endpoints);
             });
     });
 });
@@ -41,7 +41,7 @@ describe('/api/articles/:article_id', () => {
             .get('/api/articles/5')
             .expect(200)
             .then((response) => {
-                expect(response.body).toEqual({
+                expect(response.body.article).toEqual({
                     article_id: expect.any(Number),
                     author: expect.any(String),
                     title: expect.any(String),
