@@ -41,7 +41,8 @@ describe('/api/articles/:article_id', () => {
             .get('/api/articles/5')
             .expect(200)
             .then((response) => {
-                expect(response.body.article).toEqual({
+                expect(response.body.article.article_id).toBe(5)
+                expect(response.body.article).toEqual(expect.objectContaining({
                     article_id: expect.any(Number),
                     author: expect.any(String),
                     title: expect.any(String),
@@ -50,7 +51,7 @@ describe('/api/articles/:article_id', () => {
                     created_at: expect.any(String),
                     votes: expect.any(Number),
                     article_img_url: expect.any(String)
-                })
+                }))
             })
     });
     test('GET:404 responds with error message when id does not exist', () => {
