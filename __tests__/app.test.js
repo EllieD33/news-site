@@ -92,4 +92,12 @@ describe('/api/articles', () => {
                 })
             })
     });
+    test('GET:200 served array is sorted by date in descending order by default', () => {
+        return request(app)
+            .get('/api/articles')
+            .expect(200)
+            .then((response) => {
+                expect(response.body.articles).toBeSortedBy('created_at', { descending: true})
+            })
+    });
 });
