@@ -53,4 +53,20 @@ describe('/api/articles/:article_id', () => {
                 })
             })
     });
+    test('GET:404 responds with error message when id does not exist', () => {
+        return request(app)
+            .get('/api/articles/9999')
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe('Not found');
+            })
+    });
+    test('GET:400 responds with error when given invalid id', () => {
+        return request(app)
+            .get('/api/articles/twenty')
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe('Bad request');
+            })
+    });
 });
