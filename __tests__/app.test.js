@@ -100,4 +100,13 @@ describe('/api/articles', () => {
                 expect(response.body.articles).toBeSortedBy('created_at', { descending: true})
             })
     });
+    test('GET:200 correctly counts comments', () => {
+        return request(app)
+            .get('/api/articles')
+            .expect(200)
+            .then((response) => {
+                expect(response.body.articles[7].comment_count).toBe(2)
+                expect(response.body.articles[9].comment_count).toBe(0)
+            })
+    });
 });
