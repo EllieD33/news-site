@@ -1,4 +1,4 @@
-const { fetchArticleById, fetchArticles } = require('../models/articles.models')
+const { fetchArticleById, fetchArticles, fetchComments } = require('../models/articles.models')
 
 exports.getArticleById = (req, res, next) => {
     const id = req.params.article_id
@@ -15,5 +15,13 @@ exports.getArticles = (req, res, next) => {
             comment_count: Number(article.comment_count)
         }))
         res.status(200).send({ articles });
+    }).catch(next);
+}
+
+exports.getComments = (req, res, next) => {
+    const id = req.params.article_id;
+    fetchComments(id).then((result) => {
+        const comments = result
+        res.status(200).send({ comments });
     }).catch(next);
 }
