@@ -1,4 +1,5 @@
-const db = require('../../db/connection')
+const db = require('../../db/connection');
+const format = require("pg-format");
 
 exports.fetchArticleById = (id) => {    
     const selectQuery = `SELECT * FROM articles WHERE article_id = $1`
@@ -39,4 +40,10 @@ exports.fetchComments = (id) => {
             })
         } else return result.rows
     })
+}
+
+exports.insertComment = (article_id, author, body) => {
+    const formattedComment = [article_id, author, body]
+    const insertQuery = format(`INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3) RETURNING *;`)
+    return db.query(insertQuery, formattedComment)
 }

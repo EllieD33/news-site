@@ -1,5 +1,6 @@
 exports.handleBadRequest = (err, req, res, next) => {
     if (err.code) {
+        console.log(err)
         res.status(400).send({ msg: 'Bad request' });
     } else next(err);
 }

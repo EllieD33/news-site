@@ -1,4 +1,4 @@
-const { fetchArticleById, fetchArticles, fetchComments } = require('../models/articles.models')
+const { fetchArticleById, fetchArticles, fetchComments, insertComment } = require('../models/articles.models')
 
 exports.getArticleById = (req, res, next) => {
     const id = req.params.article_id
@@ -23,5 +23,15 @@ exports.getComments = (req, res, next) => {
     fetchComments(id).then((result) => {
         const comments = result
         res.status(200).send({ comments });
+    }).catch(next);
+}
+
+exports.addComment = (req, res, next) => {
+    const id = req.params.article_id;
+    const username = req.body.username;
+    const comment = req.body.body;
+    insertComment(id, username, comment).then((result) => {
+        const comment = result.rows[0]
+        res.status(201).send({ comment });
     }).catch(next);
 }

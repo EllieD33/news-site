@@ -163,4 +163,23 @@ describe('/api/articles/:article_id/comments', () => {
                 expect(response.body.msg).toBe('Not found');
             })
     });
+    test.only('POST:201 responds with the posted comment', () => {
+        return request(app)
+            .post('/api/articles/8/comments')
+            .send({
+                username: 'rogersop',
+                body: 'yeah right'
+            })
+            .expect(201)
+            .then((response) => {
+                console.log(response.body.comment)
+                expect(response.body.comment).toEqual(expect.objectContaining({
+                    comment_id: expect.any(Number),
+                    created_at: expect.any(String),
+                    author: expect.any(String),
+                    body: expect.any(String),
+                    article_id: expect.any(Number)
+                }))
+            })
+    });
 });
