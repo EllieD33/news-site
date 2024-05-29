@@ -22,8 +22,8 @@ exports.fetchArticleById = (id) => {
     })
 }
 
-exports.fetchArticles = () => {    
-    const selectQuery = `SELECT 
+exports.fetchArticles = async (topic) => {   
+    let selectQuery = `SELECT 
         articles.author, 
         articles.title, 
         articles.article_id, 
@@ -33,10 +33,24 @@ exports.fetchArticles = () => {
         articles.article_img_url, 
         COUNT(comments.comment_id) AS comment_count 
     FROM articles
-    LEFT JOIN comments ON articles.article_id = comments.article_id
-    GROUP BY articles.article_id
-    ORDER BY articles.created_at DESC`
-    return db.query(selectQuery)
+    LEFT JOIN comments ON articles.article_id = comments.article_id`;
+    const queryValues = [];
+
+    if (topic) {
+        const topics = await db.query(`SELECT slug FROM topics;`)
+        validTopics = topics.rows.map((topic) => Object.values(topic)).flat()
+        if (!validTopics.includes(topic)) {
+            return Promise.reject({ status: 400, msg: "Bad request" });
+        } else {
+            selectQuery += ' WHERE topic = $1'
+            queryValues.push(topic)
+        }
+    }
+    
+    selectQuery += ` GROUP BY articles.article_id
+        ORDER BY articles.created_at DESC`
+
+    return db.query(selectQuery, queryValues)
 }
 
 exports.fetchComments = async (id) => {
