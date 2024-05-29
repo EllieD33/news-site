@@ -1,4 +1,4 @@
-const { fetchArticleById, fetchArticles, fetchComments, insertComment } = require('../models/articles.models')
+const { fetchArticleById, fetchArticles, fetchComments, insertComment, updateVotes } = require('../models/articles.models')
 
 exports.getArticleById = (req, res, next) => {
     const id = req.params.article_id
@@ -35,4 +35,14 @@ exports.addComment = (req, res, next) => {
         const comment = result.rows[0]
         res.status(201).send({ comment });
     }).catch(next);
+}
+
+exports.updateArticle = (req, res, next) => {
+    const id = req.params.article_id;
+    const votes = req.body.inc_votes;
+
+    updateVotes(id, votes).then((result) => {
+        const article = result.rows[0]
+        res.status(200).send({ article });
+    }).catch(next)
 }

@@ -72,3 +72,20 @@ exports.insertComment = async (article_id, author, body) => {
     const insertQuery = format(`INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3) RETURNING *;`)
     return db.query(insertQuery, formattedComment)
 }
+
+exports.updateVotes = async (article_id, votes) => {
+    if (!article_id || !votes) {
+        return Promise.reject({
+            status: 400,
+            msg: 'Bad request'
+        });
+    }
+
+    await checkExists('articles', 'article_id', article_id);
+
+    return db.query(`SELECT votes FROM articles WHERE article_id = $1`, [article_id])
+        .then((result) => {
+            updatedVotes = result.rows[0].votes + votes
+            return db.query(`UPDATE articles SET votes = $1 WHERE article_id = $2 RETURNING *;`, [updatedVotes, article_id])
+        })
+}
