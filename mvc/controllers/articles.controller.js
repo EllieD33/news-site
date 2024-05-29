@@ -3,7 +3,8 @@ const { fetchArticleById, fetchArticles, fetchComments, insertComment, updateVot
 exports.getArticleById = (req, res, next) => {
     const id = req.params.article_id
     fetchArticleById(id).then((result) => {
-        const article = result
+        const article = {...result}
+        article.comment_count = Number(article.comment_count)
         res.status(200).send({ article });
     }).catch(next);
 }
