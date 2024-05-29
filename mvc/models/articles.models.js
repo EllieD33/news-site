@@ -58,11 +58,8 @@ exports.fetchComments = async (id) => {
 }
 
 exports.insertComment = async (article_id, author, body) => {
-    await checkExists('articles', 'article_id', article_id); 
-    console.log('gets here')
+    await checkExists('articles', 'article_id', article_id);
     await checkExists('users', 'username', author); 
-    console.log('gets here 2')
-
     const formattedComment = [article_id, author, body]
     const insertQuery = format(`INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3) RETURNING *;`)
     return db.query(insertQuery, formattedComment)
