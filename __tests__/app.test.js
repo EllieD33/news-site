@@ -215,4 +215,16 @@ describe('/api/articles/:article_id/comments', () => {
                 expect(response.body.msg).toBe("Not found");
             });
     })
+    test('POST:400 returns error message when article id invalid',() => {
+        return request(app)
+            .post('/api/articles/notright/comments')
+            .send({
+                username: 'rogersop',
+                body: 'yeah right'
+            })
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe("Bad request");
+            });
+    })
 });
