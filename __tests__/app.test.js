@@ -20,7 +20,7 @@ describe('/api/topics', () => {
                     expect(topic).toHaveProperty('slug', expect.any(String));
                 })
             }) 
-    });
+    });    
 });
 
 describe('/api', () => {
@@ -179,6 +179,32 @@ describe('/api/articles', () => {
             .then((response) => {
                 expect(response.body.articles[7].comment_count).toBe(2)
                 expect(response.body.articles[9].comment_count).toBe(0)
+            })
+    });
+    test('GET:200 filters the articles by the topic value specified in the query', () => {
+        return request(app)
+            .get('/api/articles?topic=cats')
+            .expect(200)
+            .then((response) => {
+                response.body.articles.forEach((article) => {
+                    expect(article.topic).toBe('cats')
+                })
+            })
+    });
+    test('GET:400 responds with error when given non-existent topic in query', () => {
+        return request(app)
+            .get('/api/articles?topic=spiders')
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe('Bad request');
+            })
+    });
+    test('GET:200 responds with an empty array when topic exists but has no associated articles', () => {
+        return request(app)
+            .get('/api/articles?topic=paper')
+            .expect(200)
+            .then((response) => {
+                expect(response.body.articles).toEqual([]);
             })
     });
 });
