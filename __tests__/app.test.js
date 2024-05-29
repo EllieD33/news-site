@@ -4,7 +4,6 @@ const db = require('../db/connection');
 const seed = require('../db/seeds/seed');
 const data = require('../db/data/test-data/index')
 const endpoints = require('../endpoints.json');
-const articles = require('../db/data/test-data/articles');
 
 beforeEach(() => seed(data));
 afterAll(() => db.end());
@@ -126,7 +125,7 @@ describe('/api/articles/:article_id/comments', () => {
                         created_at: expect.any(String),
                         author: expect.any(String),
                         body: expect.any(String),
-                        article_id: expect.any(Number)
+                        article_id: 9
                     }))
                 })
             })
@@ -155,15 +154,15 @@ describe('/api/articles/:article_id/comments', () => {
                 expect(response.body.msg).toBe('Bad request');
             })
     });
-    test('GET:404 responds with error message when no comments', () => {
+    test('GET:200 responds with empty array when no comments', () => {
         return request(app)
             .get('/api/articles/8/comments')
-            .expect(404)
+            .expect(200)
             .then((response) => {
-                expect(response.body.msg).toBe('Not found');
+                expect(response.body.comments).toEqual([]);
             })
     });
-    test.only('POST:201 responds with the posted comment', () => {
+    test('POST:201 responds with the posted comment', () => {
         return request(app)
             .post('/api/articles/8/comments')
             .send({
@@ -172,14 +171,48 @@ describe('/api/articles/:article_id/comments', () => {
             })
             .expect(201)
             .then((response) => {
-                console.log(response.body.comment)
                 expect(response.body.comment).toEqual(expect.objectContaining({
                     comment_id: expect.any(Number),
                     created_at: expect.any(String),
-                    author: expect.any(String),
-                    body: expect.any(String),
-                    article_id: expect.any(Number)
+                    author: 'rogersop',
+                    body: 'yeah right',
+                    article_id: 8
                 }))
             })
     });
+    test('POST:400 send error when required data not included in body', () => {
+        return request(app)
+            .post("/api/articles/8/comments")
+            .send({
+                body: 'no way'
+            })
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe("Bad request");
+            });
+    });
+    test('POST:404 returns error message when username doesnt exist',() => {
+        return request(app)
+            .post('/api/articles/8/comments')
+            .send({
+                username: 'idontexist',
+                body: 'yeah right'
+            })
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe("Not found");
+            });
+    })
+    test('POST:404 returns error message when article doesnt exist',() => {
+        return request(app)
+            .post('/api/articles/88888/comments')
+            .send({
+                username: 'rogersop',
+                body: 'yeah right'
+            })
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe("Not found");
+            });
+    })
 });

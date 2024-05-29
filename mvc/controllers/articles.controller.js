@@ -30,6 +30,11 @@ exports.addComment = (req, res, next) => {
     const id = req.params.article_id;
     const username = req.body.username;
     const comment = req.body.body;
+
+    if (!id || !username || !comment) {
+        return res.status(400).send({ msg: 'Bad request' })
+    }
+
     insertComment(id, username, comment).then((result) => {
         const comment = result.rows[0]
         res.status(201).send({ comment });

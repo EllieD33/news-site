@@ -1,6 +1,15 @@
 const db = require('../../db/connection');
 const format = require("pg-format");
 
+const checkExists = async (table, column, value) => {
+    const queryStr = format("SELECT * FROM %I WHERE %I = $1;", table, column);
+    const dbOutput = await db.query(queryStr, [value]);
+
+    if (dbOutput.rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "Not found" });
+    }
+}
+
 exports.fetchArticleById = (id) => {    
     const selectQuery = `SELECT * FROM articles WHERE article_id = $1`
     return db.query(selectQuery, [id]).then((result) => {
@@ -30,19 +39,30 @@ exports.fetchArticles = () => {
     return db.query(selectQuery)
 }
 
-exports.fetchComments = (id) => {
+exports.fetchComments = async (id) => {
+    if (isNaN(id)) {
+        return Promise.reject({
+            status: 400,
+            msg: 'Bad request'
+        });
+    }
+
+    await checkExists('articles', 'article_id', id); 
+
     const selectQuery = `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC`
     return db.query(selectQuery, [id]).then((result) => {
         if (result.rows.length === 0) {
-            return Promise.reject({
-                status: 404,
-                msg: 'Not found'
-            })
+            return []
         } else return result.rows
     })
 }
 
-exports.insertComment = (article_id, author, body) => {
+exports.insertComment = async (article_id, author, body) => {
+    await checkExists('articles', 'article_id', article_id); 
+    console.log('gets here')
+    await checkExists('users', 'username', author); 
+    console.log('gets here 2')
+
     const formattedComment = [article_id, author, body]
     const insertQuery = format(`INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3) RETURNING *;`)
     return db.query(insertQuery, formattedComment)
