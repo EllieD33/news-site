@@ -69,6 +69,78 @@ describe('/api/articles/:article_id', () => {
                 expect(response.body.msg).toBe('Bad request');
             })
     });
+    test('PATCH:200 increments article votes by given amount and responds with updated article', () => {
+        return request(app)
+        .patch('/api/articles/5')
+        .send({ inc_votes: 1 })
+        .expect(200)
+        .then((response) => {
+            expect(response.body.article).toEqual(expect.objectContaining({
+                article_id: 5,
+                author: expect.any(String),
+                title: expect.any(String),
+                topic: expect.any(String),
+                body: expect.any(String),
+                created_at: expect.any(String),
+                votes: 1,
+                article_img_url: expect.any(String)
+            }))
+        })
+    });
+    test('PATCH:200 decrements article votes by given amount and responds with updated article', () => {
+        return request(app)
+        .patch('/api/articles/5')
+        .send({ inc_votes: -100 })
+        .expect(200)
+        .then((response) => {
+            expect(response.body.article).toEqual(expect.objectContaining({
+                article_id: 5,
+                author: expect.any(String),
+                title: expect.any(String),
+                topic: expect.any(String),
+                body: expect.any(String),
+                created_at: expect.any(String),
+                votes: -100,
+                article_img_url: expect.any(String)
+            }))
+        })
+    });
+    test('PATCH:400 responds with error message when request body invalid', () => {
+        return request(app)
+        .patch('/api/articles/5')
+        .send({ inc_votes: 'twenty' })
+        .expect(400)
+        .then((response) => {
+            expect(response.body.msg).toBe('Bad request')
+        })
+    });
+    test('PATCH:400 responds with error message when request body missing', () => {
+        return request(app)
+        .patch('/api/articles/5')
+        .send({})
+        .expect(400)
+        .then((response) => {
+            expect(response.body.msg).toBe('Bad request')
+        })
+    });
+    test('PATCH:404 responds with error message when article id does not exist', () => {
+        return request(app)
+        .patch('/api/articles/555555')
+        .send({ inc_votes: -100 })
+        .expect(404)
+        .then((response) => {
+            expect(response.body.msg).toBe('Not found')
+        })
+    });
+    test('PATCH:400 responds with error message when article id invalid', () => {
+        return request(app)
+        .patch('/api/articles/yoyoyo')
+        .send({ inc_votes: -100 })
+        .expect(400)
+        .then((response) => {
+            expect(response.body.msg).toBe('Bad request')
+        })
+    });
 });
 
 describe('/api/articles', () => {
