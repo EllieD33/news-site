@@ -90,5 +90,8 @@
                 "article_id": 8
             }
         }
+    },
+    "DELETE /api/comments/:comment_id": {
+        "description": "deletes comment by provided id"
     }
 }

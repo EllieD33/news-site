@@ -89,3 +89,16 @@ exports.updateVotes = async (article_id, votes) => {
             return db.query(`UPDATE articles SET votes = $1 WHERE article_id = $2 RETURNING *;`, [updatedVotes, article_id])
         })
 }
+
+exports.removeComment = async (comment_id) => {
+    if (!comment_id) {
+        return Promise.reject({
+            status: 400,
+            msg: 'Bad request'
+        });
+    }
+
+    await checkExists('comments', 'comment_id', comment_id);
+
+    return db.query(`DELETE FROM comments WHERE comment_id = $1`, [comment_id]);
+}
