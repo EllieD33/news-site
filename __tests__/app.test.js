@@ -150,7 +150,7 @@ describe('/api/articles', () => {
             .get('/api/articles')
             .expect(200)
             .then((response) => {
-                expect(response.body.articles.length).toBe(13);
+                expect(response.body.articles.length).toBe(10);
                 response.body.articles.forEach((article) => {
                     expect(article).toEqual(expect.objectContaining({
                         article_id: expect.any(Number),

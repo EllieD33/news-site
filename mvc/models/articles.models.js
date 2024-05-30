@@ -36,7 +36,7 @@ exports.fetchArticleById = (id) => {
         });
 };
 
-exports.fetchArticles = (topic, sortBy, order) => {
+exports.fetchArticles = (topic, sortBy, order, pageLimit, page) => {
     let selectQuery = `SELECT 
         articles.author, 
         articles.title, 
@@ -70,6 +70,13 @@ exports.fetchArticles = (topic, sortBy, order) => {
 
     const sortQuery = sortStr + orderStr;
 
+    let limit = 10
+    if (pageLimit && typeof pageLimit === 'Number') {
+        limit = pageLimit 
+    }
+    const offset = (page - 1) * limit;
+    let paginationStr = ` LIMIT $${queryValues.length + 1} OFFSET $${queryValues.length + 2}`;
+
     if (topic) {
         return db.query(`SELECT slug FROM topics;`).then((topics) => {
             const validTopics = topics.rows
@@ -82,12 +89,15 @@ exports.fetchArticles = (topic, sortBy, order) => {
                 queryValues.push(topic);
             }
             selectQuery += " GROUP BY articles.article_id" + sortQuery;
-
+            paginationStr = ` LIMIT $${queryValues.length + 1} OFFSET $${queryValues.length + 2}`
+            selectQuery += paginationStr;
+            queryValues.push(limit, offset);
             return db.query(selectQuery, queryValues);
         });
     } else {
         selectQuery += " GROUP BY articles.article_id" + sortQuery;
-
+        selectQuery += paginationStr;
+        queryValues.push(limit, offset);
         return db.query(selectQuery, queryValues);
     }
 };
