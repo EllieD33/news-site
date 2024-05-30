@@ -182,31 +182,75 @@ describe('/api/articles', () => {
                 expect(response.body.articles[9].comment_count).toBe(0)
             })
     });
-    test('GET:200 filters the articles by the topic value specified in the query', () => {
-        return request(app)
-            .get('/api/articles?topic=cats')
-            .expect(200)
-            .then((response) => {
-                response.body.articles.forEach((article) => {
-                    expect(article.topic).toBe('cats')
+    describe('/api/articles filter query', () => {
+        test('GET:200 filters the articles by the topic value specified in the query', () => {
+            return request(app)
+                .get('/api/articles?topic=cats')
+                .expect(200)
+                .then((response) => {
+                    response.body.articles.forEach((article) => {
+                        expect(article.topic).toBe('cats')
+                    })
                 })
-            })
+        });
+        test('GET:400 responds with error when given non-existent topic in query', () => {
+            return request(app)
+                .get('/api/articles?topic=spiders')
+                .expect(400)
+                .then((response) => {
+                    expect(response.body.msg).toBe('Bad request');
+                })
+        });
+        test('GET:200 responds with an empty array when topic exists but has no associated articles', () => {
+            return request(app)
+                .get('/api/articles?topic=paper')
+                .expect(200)
+                .then((response) => {
+                    expect(response.body.articles).toEqual([]);
+                })
+        });
     });
-    test('GET:400 responds with error when given non-existent topic in query', () => {
-        return request(app)
-            .get('/api/articles?topic=spiders')
-            .expect(400)
-            .then((response) => {
-                expect(response.body.msg).toBe('Bad request');
-            })
-    });
-    test('GET:200 responds with an empty array when topic exists but has no associated articles', () => {
-        return request(app)
-            .get('/api/articles?topic=paper')
+    describe('/api/articles sort and order queries', () => {
+        test('GET:200 sorts by given column in desc order when no order specified', () => {
+            return request(app)
+            .get('/api/articles?sort_by=title')
             .expect(200)
             .then((response) => {
-                expect(response.body.articles).toEqual([]);
+                expect(response.body.articles).toBeSortedBy('title', { descending: true})
             })
+        });
+        test('GET:200 sorts by given column in asc order', () => {
+            return request(app)
+            .get('/api/articles?sort_by=author&order=asc')
+            .expect(200)
+            .then((response) => {
+                expect(response.body.articles).toBeSortedBy('author')
+            })
+        });
+        test('GET:200 sorts by given column in desc order', () => {
+            return request(app)
+            .get('/api/articles?sort_by=comment_count&order=desc')
+            .expect(200)
+            .then((response) => {
+                expect(response.body.articles).toBeSortedBy('comment_count', { descending: true})
+            })
+        });
+        test('GET:400 responds with error message when passed invalid sort query', () => {
+            return request(app)
+                .get('/api/articles?sort_by=monkey')
+                .expect(400)
+                .then((response) => {
+                    expect(response.body.msg).toBe('Bad request');
+                })
+        });
+        test('GET:400 responds with error message when passed invalid sort query', () => {
+            return request(app)
+                .get('/api/articles?sort_by=title&order=cats')
+                .expect(400)
+                .then((response) => {
+                    expect(response.body.msg).toBe('Bad request');
+                })
+        });
     });
 });
 

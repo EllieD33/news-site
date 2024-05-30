@@ -10,8 +10,8 @@ exports.getArticleById = (req, res, next) => {
 }
 
 exports.getArticles = (req, res, next) => {
-    const { topic } = req.query
-    fetchArticles(topic).then((result) => {
+    const { topic, sort_by, order } = req.query
+    fetchArticles(topic, sort_by, order).then((result) => {
         const articles = result.rows.map(article => ({
             ...article,
             comment_count: Number(article.comment_count)
