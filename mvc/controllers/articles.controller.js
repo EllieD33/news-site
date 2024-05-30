@@ -1,4 +1,4 @@
-const { fetchArticleById, fetchArticles, fetchComments, insertComment, updateVotes, removeComment } = require('../models/articles.models')
+const { fetchArticleById, fetchArticles, fetchComments, insertComment, updateArticleVotes, removeComment, updateCommentVotes } = require('../models/articles.models')
 
 exports.getArticleById = (req, res, next) => {
     const id = req.params.article_id
@@ -43,7 +43,7 @@ exports.updateArticle = (req, res, next) => {
     const id = req.params.article_id;
     const votes = req.body.inc_votes;
 
-    updateVotes(id, votes).then((result) => {
+    updateArticleVotes(id, votes).then((result) => {
         const article = result.rows[0]
         res.status(200).send({ article });
     }).catch(next)
@@ -53,5 +53,13 @@ exports.deleteComment = (req, res, next) => {
     const id = req.params.comment_id
     removeComment(id).then(() => {
         res.status(204).send()
+    }).catch(next)
+}
+
+exports.updateComment = (req, res, next) => {
+    const id = req.params.comment_id;
+    const votes = req.body.inc_votes;
+    updateCommentVotes(id, votes).then((comment) => {
+        res.status(200).send({ comment });
     }).catch(next)
 }
