@@ -1,4 +1,4 @@
-const { fetchArticleById, fetchArticles, fetchComments, insertComment, updateArticleVotes, removeComment, updateCommentVotes } = require('../models/articles.models')
+const { fetchArticleById, fetchArticles, fetchComments, insertComment, updateArticleVotes, removeComment, updateCommentVotes, postArticle } = require('../models/articles.models')
 
 exports.getArticleById = (req, res, next) => {
     const id = req.params.article_id
@@ -46,14 +46,14 @@ exports.updateArticle = (req, res, next) => {
     updateArticleVotes(id, votes).then((result) => {
         const article = result.rows[0]
         res.status(200).send({ article });
-    }).catch(next)
+    }).catch(next);
 }
 
 exports.deleteComment = (req, res, next) => {
     const id = req.params.comment_id
     removeComment(id).then(() => {
         res.status(204).send()
-    }).catch(next)
+    }).catch(next);
 }
 
 exports.updateComment = (req, res, next) => {
@@ -61,5 +61,18 @@ exports.updateComment = (req, res, next) => {
     const votes = req.body.inc_votes;
     updateCommentVotes(id, votes).then((comment) => {
         res.status(200).send({ comment });
+    }).catch(next);
+}
+
+exports.addArticle = (req, res, next) => {
+    author = req.body.author;
+    title = req.body.title;
+    text = req.body.body;
+    topic = req.body.topic;
+    image = req.body.article_img_url;
+    postArticle(author, title, text, topic, image).then((result) => {
+        const article = {...result}
+        article.comment_count = Number(article.comment_count)
+        res.status(201).send({ article })
     }).catch(next)
 }

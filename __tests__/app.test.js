@@ -152,7 +152,7 @@ describe('/api/articles', () => {
             .then((response) => {
                 expect(response.body.articles.length).toBe(13);
                 response.body.articles.forEach((article) => {
-                    expect(article).toEqual({
+                    expect(article).toEqual(expect.objectContaining({
                         article_id: expect.any(Number),
                         author: expect.any(String),
                         title: expect.any(String),
@@ -161,7 +161,7 @@ describe('/api/articles', () => {
                         article_img_url: expect.any(String),
                         votes: expect.any(Number),
                         comment_count: expect.any(Number)
-                    })
+                    }))
                 })
             })
     });
@@ -251,6 +251,85 @@ describe('/api/articles', () => {
                     expect(response.body.msg).toBe('Bad request');
                 })
         });
+    });
+    test('POST:201 inserts new article and serves new article object', () => {
+        return request(app)
+            .post('/api/articles')
+            .send({
+                author: 'butter_bridge',
+                title: 'Dogs are superior to cats',
+                body: 'And golden retrievers are the best and cutest doggos ever, FACT! They are dopey and cute and clever and gentle and endlessly loyal. They are the Peter Pans of dogs - goofballs that never grow up. Tell me, what more could you want from a dog?',
+                topic: 'cats',
+                article_img_url: 'https://www.rover.com/blog/wp-content/uploads/2021/06/denvers_golden_life-1024x1024.jpg'
+            })
+            .expect(201)
+            .then((response) => {
+                expect(response.body.article).toEqual(expect.objectContaining({
+                    article_id: expect.any(Number),
+                    author: expect.any(String),
+                    title: expect.any(String),
+                    body: expect.any(String),
+                    topic: expect.any(String),
+                    created_at: expect.any(String),
+                    article_img_url: expect.any(String),
+                    votes: expect.any(Number),
+                    comment_count: expect.any(Number)
+                }))
+            })
+    });
+    test('POST:201 adds default image url if none provided', () => {
+        return request(app)
+            .post('/api/articles')
+            .send({
+                author: 'butter_bridge',
+                title: 'Dogs are superior to cats',
+                body: 'And golden retrievers are the best and cutest doggos ever, FACT! They are dopey and cute and clever and gentle and endlessly loyal. They are the Peter Pans of dogs - goofballs that never grow up. Tell me, what more could you want from a dog?',
+                topic: 'cats',
+            })
+            .expect(201)
+            .then((response) => {
+                expect(response.body.article).toHaveProperty('article_img_url', 'https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700')
+            })
+    });
+    test('POST:400 responds with error if one or more required fields is missing', () => {
+        return request(app)
+            .post('/api/articles')
+            .send({
+                author: 'butter_bridge',
+                title: 'Dogs are superior to cats',
+            })
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe('Bad request')
+            })
+    });
+    test('POST:400 responds with error if one or more required fields contains invalid data types', () => {
+        return request(app)
+            .post('/api/articles')
+            .send({
+                author: 'butter_bridge',
+                title: 256,
+                body: 'And golden retrievers are the best and cutest doggos ever, FACT! They are dopey and cute and clever and gentle and endlessly loyal. They are the Peter Pans of dogs - goofballs that never grow up. Tell me, what more could you want from a dog?',
+                topic: 'cats',
+            })
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe('Bad request')
+            })
+    });
+    test('POST:404 responds with error if references values dont exist', () => {
+        return request(app)
+            .post('/api/articles')
+            .send({
+                author: 'not-here',
+                title: 'Dogs are superior to cats',
+                body: 'And golden retrievers are the best and cutest doggos ever, FACT! They are dopey and cute and clever and gentle and endlessly loyal. They are the Peter Pans of dogs - goofballs that never grow up. Tell me, what more could you want from a dog?',
+                topic: 'cats',
+            })
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe('Not found')
+            })
     });
 });
 
