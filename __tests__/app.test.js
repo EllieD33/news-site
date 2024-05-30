@@ -367,12 +367,20 @@ describe('/api/articles', () => {
                 });
             });
         });
-        test('GET:200 adds total results count to served object', () => {
+        test('GET:200 adds total results count to served object accounting for filtering', () => {
             return request(app)
             .get('/api/articles?topic=mitch')
             .expect(200)
             .then((response) => {
-                expect(response.body).toHaveProperty('total_count')
+                expect(response.body).toHaveProperty('total_count', 12)
+            })
+        });
+        test('GET:200 adds total results count to served object', () => {
+            return request(app)
+            .get('/api/articles')
+            .expect(200)
+            .then((response) => {
+                expect(response.body).toHaveProperty('total_count', 13)
             })
         });
     });

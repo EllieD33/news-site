@@ -115,7 +115,7 @@ exports.fetchArticles = (topic, sortBy, order, pageLimit, page) => {
         queryValues.push(limit, offset);
 
         const articlesQuery = db.query(selectQuery, queryValues);
-        const totalCountQuery = db.query(`SELECT COUNT(*) FROM articles WHERE topic = $1;`, [topic]);
+        const totalCountQuery = db.query(`SELECT COUNT(*) FROM articles;`);
         
         return Promise.all([articlesQuery, totalCountQuery]).then(([articlesResult, totalCountResult]) => {
             const articles = articlesResult.rows.map(article => ({
