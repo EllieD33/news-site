@@ -1,7 +1,7 @@
 const db = require('../../db/connection');
 const format = require("pg-format");
 
-const checkExists = (table, column, value) => {
+exports.checkExists = (table, column, value) => {
     const queryStr = format("SELECT * FROM %I WHERE %I = $1;", table, column);
     return db.query(queryStr, [value]).then((dbOutput) => {
         if (dbOutput.rows.length === 0) {
@@ -26,7 +26,7 @@ exports.fetchArticleById = (id) => {
     WHERE articles.article_id = $1
     GROUP BY articles.article_id;`
 
-    return checkExists('articles', 'article_id', id).then(() => {
+    return exports.checkExists('articles', 'article_id', id).then(() => {
         return db.query(selectQuery, [id]);
     }).then((result) => {
         return result.rows[0];
@@ -95,7 +95,7 @@ exports.fetchComments = (id) => {
         });
     }
 
-    return checkExists('articles', 'article_id', id).then(() => {
+    return exports.checkExists('articles', 'article_id', id).then(() => {
         const selectQuery = `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC`;
         return db.query(selectQuery, [id]);
     }).then((result) => {
@@ -115,8 +115,8 @@ exports.insertComment = (article_id, author, body) => {
         });
     }
 
-    return checkExists('articles', 'article_id', article_id).then(() => {
-        return checkExists('users', 'username', author);
+    return exports.checkExists('articles', 'article_id', article_id).then(() => {
+        return exports.checkExists('users', 'username', author);
     }).then(() => {
         const formattedComment = [article_id, author, body];
         const insertQuery = format(`INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3) RETURNING *;`);
@@ -132,7 +132,7 @@ exports.updateVotes = (article_id, votes) => {
         });
     }
 
-    return checkExists('articles', 'article_id', article_id).then(() => {
+    return exports.checkExists('articles', 'article_id', article_id).then(() => {
         return db.query(`SELECT votes FROM articles WHERE article_id = $1`, [article_id]);
     }).then((result) => {
         const updatedVotes = result.rows[0].votes + votes;
@@ -148,7 +148,7 @@ exports.removeComment = (comment_id) => {
         });
     }
 
-    return checkExists('comments', 'comment_id', comment_id).then(() => {
+    return exports.checkExists('comments', 'comment_id', comment_id).then(() => {
         return db.query(`DELETE FROM comments WHERE comment_id = $1`, [comment_id]);
     });
 }

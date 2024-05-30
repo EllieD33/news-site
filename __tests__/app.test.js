@@ -411,3 +411,26 @@ describe('/api/users', () => {
             })
     });
 });
+
+describe('/api/users/:username', () => {
+    test('GET:200 responds with specified user object', () => {
+        return request(app)
+            .get('/api/users/lurker')
+            .expect(200)
+            .then((response) => {
+                expect(response.body.user).toEqual(expect.objectContaining({
+                    username: 'lurker',
+                    name: 'do_nothing',
+                    avatar_url: 'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png'
+                }))
+            })
+    });
+    test('GET:404 responds with error is username doesnt exist', () => {
+        return request(app)
+            .get('/api/users/idontexist')
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe('Not found');
+            })
+    });
+});
