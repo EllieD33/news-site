@@ -1,6 +1,5 @@
 const express = require('express');
 const { handleBadRequest, handleErrorMessage, handleServerError } = require('./error-handler')
-const { getEndpoints } = require('./mvc/controllers/api.controller')
 const { getAllTopics } = require('./mvc/controllers/topics.controller')
 const { getArticleById, getArticles, getComments, addComment, updateArticle, deleteComment} = require('./mvc/controllers/articles.controller')
 const { getUsers } = require('./mvc/controllers/users.controller')
@@ -8,7 +7,8 @@ const app = express();
 
 app.use(express.json());
 
-app.get('/api', getEndpoints);
+const apiRouter = require('./routes/api.router');
+app.use('/api', apiRouter);
 
 app.get('/api/topics', getAllTopics);
 
