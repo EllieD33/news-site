@@ -55,10 +55,14 @@ exports.fetchArticles = (topic, sortBy, order) => {
 
     if (order && validOrders.includes(order.toUpperCase())) {
         orderStr = ' ' + order.toUpperCase();
+    } else if (order && !validOrders.includes(order.toUpperCase())) {
+        return Promise.reject({ status: 400, msg: "Bad request" });
     }
 
     if (sortBy && validSorts.includes(sortBy)) {
         sortStr = ' ORDER BY ' + sortBy;
+    } else if (sortBy && !validSorts.includes(sortBy)) {
+        return Promise.reject({ status: 400, msg: "Bad request" });
     }
 
     const sortQuery = sortStr + orderStr;

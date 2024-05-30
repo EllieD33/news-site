@@ -235,6 +235,22 @@ describe('/api/articles', () => {
                 expect(response.body.articles).toBeSortedBy('comment_count', { descending: true})
             })
         });
+        test('GET:400 responds with error message when passed invalid sort query', () => {
+            return request(app)
+                .get('/api/articles?sort_by=monkey')
+                .expect(400)
+                .then((response) => {
+                    expect(response.body.msg).toBe('Bad request');
+                })
+        });
+        test('GET:400 responds with error message when passed invalid sort query', () => {
+            return request(app)
+                .get('/api/articles?sort_by=title&order=cats')
+                .expect(400)
+                .then((response) => {
+                    expect(response.body.msg).toBe('Bad request');
+                })
+        });
     });
 });
 
