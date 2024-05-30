@@ -12,12 +12,8 @@ exports.getArticleById = (req, res, next) => {
 exports.getArticles = (req, res, next) => {
     const { topic, sort_by, order, limit } = req.query
     const page = parseInt(req.query.page) || 1;
-    fetchArticles(topic, sort_by, order, limit, page).then((result) => {
-        const articles = result.rows.map(article => ({
-            ...article,
-            comment_count: Number(article.comment_count)
-        }))
-        res.status(200).send({ articles });
+    fetchArticles(topic, sort_by, order, limit, page).then((articles) => {
+        res.status(200).send(articles);
     }).catch(next);
 }
 

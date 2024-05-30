@@ -96,13 +96,35 @@ exports.fetchArticles = (topic, sortBy, order, pageLimit, page) => {
             paginationStr = ` LIMIT $${queryValues.length + 1} OFFSET $${queryValues.length + 2}`
             selectQuery += paginationStr;
             queryValues.push(limit, offset);
-            return db.query(selectQuery, queryValues);
+            
+            const articlesQuery = db.query(selectQuery, queryValues);
+            const totalCountQuery = db.query(`SELECT COUNT(*) FROM articles WHERE topic = $1;`, [topic]);
+            
+            return Promise.all([articlesQuery, totalCountQuery]).then(([articlesResult, totalCountResult]) => {
+                const articles = articlesResult.rows.map(article => ({
+                    ...article,
+                    comment_count: Number(article.comment_count)
+                }))
+                const totalCount = parseInt(totalCountResult.rows[0].count)
+                return { articles, total_count: totalCount }
+            })
         });
     } else {
         selectQuery += " GROUP BY articles.article_id" + sortQuery;
         selectQuery += paginationStr;
         queryValues.push(limit, offset);
-        return db.query(selectQuery, queryValues);
+
+        const articlesQuery = db.query(selectQuery, queryValues);
+        const totalCountQuery = db.query(`SELECT COUNT(*) FROM articles WHERE topic = $1;`, [topic]);
+        
+        return Promise.all([articlesQuery, totalCountQuery]).then(([articlesResult, totalCountResult]) => {
+            const articles = articlesResult.rows.map(article => ({
+                ...article,
+                comment_count: Number(article.comment_count)
+            }))
+            const totalCount = parseInt(totalCountResult.rows[0].count)
+            return { articles, total_count: totalCount }
+        })
     }
 };
 
