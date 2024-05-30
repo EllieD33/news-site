@@ -33,7 +33,7 @@ exports.fetchArticleById = (id) => {
     });
 }
 
-exports.fetchArticles = (topic) => {   
+exports.fetchArticles = (topic, sortBy, order) => {   
     let selectQuery = `SELECT 
         articles.author, 
         articles.title, 
@@ -47,6 +47,22 @@ exports.fetchArticles = (topic) => {
     LEFT JOIN comments ON articles.article_id = comments.article_id`;
     const queryValues = [];
 
+    const validSorts = ['author', 'title', 'topic', 'votes', 'comment_count'];
+    const validOrders = ['ASC', 'DESC'];
+
+    let sortStr = ' ORDER BY created_at'
+    let orderStr = ' DESC'
+
+    if (order && validOrders.includes(order.toUpperCase())) {
+        orderStr = ' ' + order.toUpperCase();
+    }
+
+    if (sortBy && validSorts.includes(sortBy)) {
+        sortStr = ' ORDER BY ' + sortBy;
+    }
+
+    const sortQuery = sortStr + orderStr;
+
     if (topic) {
         return db.query(`SELECT slug FROM topics;`).then((topics) => {
             const validTopics = topics.rows.map((topic) => Object.values(topic)).flat();
@@ -56,14 +72,12 @@ exports.fetchArticles = (topic) => {
                 selectQuery += ' WHERE topic = $1';
                 queryValues.push(topic);
             }
-            selectQuery += ` GROUP BY articles.article_id
-            ORDER BY articles.created_at DESC`;
+            selectQuery += ' GROUP BY articles.article_id' + sortQuery;
 
             return db.query(selectQuery, queryValues);
         });
     } else {
-        selectQuery += ` GROUP BY articles.article_id
-        ORDER BY articles.created_at DESC`;
+        selectQuery += ' GROUP BY articles.article_id' + sortQuery;
 
         return db.query(selectQuery, queryValues);
     }
