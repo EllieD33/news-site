@@ -124,7 +124,7 @@ exports.insertComment = (article_id, author, body) => {
     });
 }
 
-exports.updateVotes = (article_id, votes) => {
+exports.updateArticleVotes = (article_id, votes) => {
     if (!article_id || !votes) {
         return Promise.reject({
             status: 400,
@@ -150,5 +150,24 @@ exports.removeComment = (comment_id) => {
 
     return exports.checkExists('comments', 'comment_id', comment_id).then(() => {
         return db.query(`DELETE FROM comments WHERE comment_id = $1`, [comment_id]);
+    });
+}
+
+exports.updateCommentVotes = (comment_id, votes) => {
+    if (!comment_id || !votes) {
+        return Promise.reject({
+            status: 400,
+            msg: 'Bad request'
+        });
+    }
+
+    return exports.checkExists('comments', 'comment_id', comment_id).then(() => {
+        return db.query(`SELECT votes FROM comments WHERE comment_id = $1`, [comment_id]);
+    }).then((result) => {
+        const updatedVotes = result.rows[0].votes + votes;
+        return db.query(`UPDATE comments SET votes = $1 WHERE comment_id = $2 RETURNING *;`, [updatedVotes, comment_id])
+            .then((result) => {
+                return result.rows[0]
+            });
     });
 }

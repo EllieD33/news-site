@@ -392,6 +392,74 @@ describe('/api/comments/:comment_id', () => {
             expect(response.body.msg).toBe("Not found");
         })
     });
+    test('PATCH:200 increments comment votes by given amount and responds with updated comment', () => {
+        return request(app)
+        .patch('/api/comments/1')
+        .send({ inc_votes : 1 })
+        .expect(200)
+        .then((response) => {
+            expect(response.body.comment).toEqual(expect.objectContaining({
+                comment_id: 1,
+                body: expect.any(String),
+                votes: 17,
+                author: expect.any(String),
+                article_id: expect.any(Number),
+                created_at: expect.any(String),
+            }))
+        })
+    });
+    test('PATCH:200 decrements comment votes by given amount and responds with updated comment', () => {
+        return request(app)
+        .patch('/api/comments/1')
+        .send({ inc_votes : -10 })
+        .expect(200)
+        .then((response) => {
+            expect(response.body.comment).toEqual(expect.objectContaining({
+                comment_id: 1,
+                body: expect.any(String),
+                votes: 6,
+                author: expect.any(String),
+                article_id: expect.any(Number),
+                created_at: expect.any(String),
+            }))
+        })
+    });
+    test('PATCH:400 responds with error if comment id invalid', () => {
+        return request(app)
+        .patch('/api/comments/twenty')
+        .send({ inc_votes : -10 })
+        .expect(400)
+        .then((response) => {
+            expect(response.body.msg).toBe('Bad request')
+        })
+    });
+    test('PATCH:400 responds with error if body data invalid', () => {
+        return request(app)
+        .patch('/api/comments/1')
+        .send({ inc_votes : 'ten' })
+        .expect(400)
+        .then((response) => {
+            expect(response.body.msg).toBe('Bad request')
+        })
+    });
+    test('PATCH:400 responds with error if body data missing', () => {
+        return request(app)
+        .patch('/api/comments/1')
+        .send({ })
+        .expect(400)
+        .then((response) => {
+            expect(response.body.msg).toBe('Bad request')
+        })
+    });
+    test('PATCH:404 responds with error if comment doesnt exist', () => {
+        return request(app)
+        .patch('/api/comments/11111111')
+        .send({ inc_votes : 10 })
+        .expect(404)
+        .then((response) => {
+            expect(response.body.msg).toBe('Not found')
+        })
+    });
 });
 
 describe('/api/users', () => {
