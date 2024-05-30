@@ -67,13 +67,17 @@ exports.fetchArticles = (topic, sortBy, order, pageLimit, page) => {
     } else if (sortBy && !validSorts.includes(sortBy)) {
         return Promise.reject({ status: 400, msg: "Bad request" });
     }
-
+    
     const sortQuery = sortStr + orderStr;
 
+    const validPaginations = [5, 10, 20, 50, 100, 250]
     let limit = 10
-    if (pageLimit && typeof pageLimit === 'Number') {
-        limit = pageLimit 
-    }
+    if(pageLimit && validPaginations.includes(parseInt(pageLimit))) {
+            limit = parseInt(pageLimit)
+        } else if (pageLimit && !validPaginations.includes(parseInt(pageLimit))) {
+            return Promise.reject({ status: 400, msg: "Bad request" })
+        }
+
     const offset = (page - 1) * limit;
     let paginationStr = ` LIMIT $${queryValues.length + 1} OFFSET $${queryValues.length + 2}`;
 
