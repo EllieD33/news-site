@@ -319,6 +319,7 @@ describe('/api/articles/:article_id/comments', () => {
                     created_at: expect.any(String),
                     author: 'rogersop',
                     body: 'yeah right',
+                    votes: 0,
                     article_id: 8
                 }))
             })

@@ -89,12 +89,29 @@
                 "created_at": "2024-05-30T15:59:13.341Z",
                 "author": "username",
                 "body": "Text from the comment..",
+                "votes": 0,
                 "article_id": 8
             }
         }
     },
     "DELETE /api/comments/:comment_id": {
         "description": "deletes comment by provided id"
+    },
+    "PATCH /api/comments/:comment_id": {
+        "description": "updates votes on an comments by given amount and serves an object containing updated comment",
+        "exampleRequest": {
+            "inc_votes": 2
+        },
+        "exampleResponse": {
+            "comment": {
+                "comment_id": 28,
+                "created_at": "2024-05-30T15:59:13.341Z",
+                "author": "username",
+                "body": "Text from the comment..",
+                "votes": 17,
+                "article_id": 8
+            }
+        }
     },
     "GET /api/users": {
         "description": "serves an array of all users",
