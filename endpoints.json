@@ -27,6 +27,29 @@
             ]
         }
     },
+    "POST /api/articles": {
+        "description": "posts a new article and serves an object containing posted article. Article URL field is optional and will populate a default value if not provided",
+        "exampleRequest": {
+            "author": "butter_bridge",
+            "title": "Dogs are superior to cats",
+            "body": "And golden retrievers are the best and cutest doggos ever, FACT! They are dopey and cute and clever and gentle and endlessly loyal. They are the Peter Pans of dogs - goofballs that never grow up. Tell me, what more could you want from a dog?",
+            "topic": "cats",
+            "article_img_url": "https://www.rover.com/blog/wp-content/uploads/2021/06/denvers_golden_life-1024x1024.jpg"
+        },
+        "exampleResponse": {
+            "article": {
+                "author": "butter_bridge",
+                "title": "Dogs are superior to cats",
+                "body": "And golden retrievers are the best and cutest doggos ever, FACT! They are dopey and cute and clever and gentle and endlessly loyal. They are the Peter Pans of dogs - goofballs that never grow up. Tell me, what more could you want from a dog?",
+                "topic": "cats",
+                "article_img_url": "https://www.rover.com/blog/wp-content/uploads/2021/06/denvers_golden_life-1024x1024.jpg",
+                "created_at": "2018-05-30T15:59:13.341Z",
+                "votes": 0,
+                "comment_count": 0,
+                "article_id": 24
+            }
+        }
+    },
     "GET /api/articles/:article_id": {
         "description": "serves an object containing specified article",
         "queries": [],
