@@ -7,10 +7,7 @@ exports.selectTopics = () => {
 
 exports.postNewTopic = (slug, description) => {
     if (!slug || !description || typeof slug !== 'string' || typeof description !== 'string') {
-        return Promise.reject({
-            status: 400,
-            msg: "Bad request",
-        });
+        return Promise.reject({ status: 400, msg: "Bad request" });
     }
 
     const formattedTopic = [slug, description]
