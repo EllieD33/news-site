@@ -78,36 +78,32 @@ exports.fetchArticles = (topic, sortBy, order, pageLimit, page) => {
     let paginationStr = ` LIMIT $${queryValues.length + 1} OFFSET $${queryValues.length + 2}`;
 
     if (topic) {
-        return db.query(`SELECT slug FROM topics;`).then((topics) => {
-            const validTopics = topics.rows
-                .map((topic) => Object.values(topic))
-                .flat();
+        return db.query(`SELECT slug FROM topics;`)
+        .then((topics) => {
+            const validTopics = topics.rows.map(({ slug }) => slug);
             if (!validTopics.includes(topic)) {
                 return Promise.reject({ status: 400, msg: "Bad request" });
-            } else {
-                selectQuery += " WHERE topic = $1";
-                queryValues.push(topic);
-            }
-            selectQuery += " GROUP BY articles.article_id" + sortQuery;
+            } 
+            selectQuery += " WHERE topic = $1";
+            queryValues.push(topic);            
             paginationStr = ` LIMIT $${queryValues.length + 1} OFFSET $${queryValues.length + 2}`
-            selectQuery += paginationStr;
+            selectQuery += " GROUP BY articles.article_id" + sortQuery + paginationStr;
             queryValues.push(limit, offset);
             
             const articlesQuery = db.query(selectQuery, queryValues);
             const totalCountQuery = db.query(`SELECT COUNT(*) FROM articles WHERE topic = $1;`, [topic]);
             
-            return Promise.all([articlesQuery, totalCountQuery]).then(([articlesResult, totalCountResult]) => {
-                const articles = articlesResult.rows.map(article => ({
-                    ...article,
-                    comment_count: Number(article.comment_count)
-                }))
-                const totalCount = parseInt(totalCountResult.rows[0].count)
-                return { articles, total_count: totalCount }
-            })
+            return Promise.all([articlesQuery, totalCountQuery])
+        }).then(([articlesResult, totalCountResult]) => {
+            const articles = articlesResult.rows.map(article => ({
+                ...article,
+                comment_count: Number(article.comment_count)
+            }))
+            const totalCount = parseInt(totalCountResult.rows[0].count)
+            return { articles, total_count: totalCount }
         });
     } else {
-        selectQuery += " GROUP BY articles.article_id" + sortQuery;
-        selectQuery += paginationStr;
+        selectQuery += " GROUP BY articles.article_id" + sortQuery + paginationStr;
         queryValues.push(limit, offset);
 
         const articlesQuery = db.query(selectQuery, queryValues);
