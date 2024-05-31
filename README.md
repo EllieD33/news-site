@@ -12,27 +12,34 @@ GET /api
 
 GET /api/topics
 
+POST /api/topics
+
 
 GET /api/articles
+
+POST /api/articles
+
 
 GET /api/articles/:article_id
 
 PATCH /api/articles/:article_id
 
-
-GET /api/articles (queries)
-
-GET /api/articles/:article_id (comment count)
+DELETE /api/articles/:article_id
 
 
 GET /api/articles/:article_id/comments
 
 POST /api/articles/:article_id/comments
 
+
+PATCH /api/comments/:comment_id
+
 DELETE /api/comments/:comment_id
 
 
 GET /api/users
+
+GET /api/users/:username
 
 
 You can go to the /api endpoint to view more detailed descriptions of available endpoints.
@@ -49,9 +56,12 @@ Ensure you have the following installed:
 
 ### Clone the repository
 Fork and clone the repo
+
 ```git clone https://github.com/YourUsername/news-site.git```
 
+
 ### Install dependencies
+
 ```npm install```
 
 ### Create environment variables
@@ -59,11 +69,13 @@ To successfully clone and run this project locally, you will need to manually cr
 
 #### Create `.env.development`
 In the root of the project directory, create a file named `.env.development` and add the following:
-    ```PGDATABASE=nc_news```
+
+```PGDATABASE=nc_news```
 
 #### Create `.env.test`
 In the root of the project directory, create a file named `.env.test`
-    ```PGDATABASE=nc_news_test```
+
+```PGDATABASE=nc_news_test```
 
 ### Set up local database
 Ensure you have Postgres running locally, then run the script to set up the databases:
