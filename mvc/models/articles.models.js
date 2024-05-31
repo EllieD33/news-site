@@ -32,7 +32,9 @@ exports.fetchArticleById = (id) => {
             return db.query(selectQuery, [id]);
         })
         .then((result) => {
-            return result.rows[0];
+            const article = {...result.rows[0]}
+            article.comment_count = Number(article.comment_count)
+            return article;
         });
 };
 
