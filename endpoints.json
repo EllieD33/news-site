@@ -9,6 +9,15 @@
             "topics": [{ "slug": "football", "description": "Footie!" }]
         }
     },
+    "POST /api/topics": {
+        "description": "adds a new topic and serves an object containing the newly added topic",
+        "exampleRequest": {
+            "topic": { "slug": "new topic", "description": "new topic description" }
+        },
+        "exampleResponse": {
+            "topic": { "slug": "newly added topic", "description": "newly added topic description" }
+        }
+    },
     "GET /api/articles": {
         "description": "serves an array of all articles. Accepts pagination limits of: 5, 10, 20, 50, 100, 250. Served object includes a key indicating total number of articles in the array.",
         "queries": ["author", "topic", "sort_by", "order", "limit", "page"],
