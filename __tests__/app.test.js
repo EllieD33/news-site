@@ -20,7 +20,43 @@ describe('/api/topics', () => {
                     expect(topic).toHaveProperty('slug', expect.any(String));
                 })
             }) 
-    });    
+    });
+    test('POST: 201 adds new topic and responds with topic object containing the newly added topic', () => {
+        return request(app)
+            .post('/api/topics')
+            .send({
+                slug: "dogs",
+                description: "all things glorious dogs"
+            })
+            .expect(201)
+            .then((response) => {
+                expect(response.body.topic).toEqual(expect.objectContaining({
+                    slug: "dogs",
+                    description: "all things glorious dogs"
+                }));
+            })
+    });
+    test('POST:400 returns error if required data not provided', () => {
+        return request(app)
+        .post('/api/topics')
+        .send({})
+        .expect(400)
+        .then((response) => {
+            expect(response.body.msg).toBe('Bad request');
+        })
+    });
+    test('POST:400 returns error if invalid data provided', () => {
+        return request(app)
+        .post('/api/topics')
+        .send({
+            slug: true,
+            description: 1066
+        })
+        .expect(400)
+        .then((response) => {
+            expect(response.body.msg).toBe('Bad request');
+        })
+    });
 });
 
 describe('/api', () => {
