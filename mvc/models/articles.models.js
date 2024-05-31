@@ -1,3 +1,4 @@
+const { agent } = require("supertest");
 const db = require("../../db/connection");
 const format = require("pg-format");
 
@@ -186,6 +187,8 @@ exports.insertComment = (article_id, author, body) => {
                 `INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3) RETURNING *;`
             );
             return db.query(insertQuery, formattedComment);
+        }).then((result) => {
+            return result.rows[0]
         });
 };
 
@@ -211,6 +214,8 @@ exports.updateArticleVotes = (article_id, votes) => {
                 `UPDATE articles SET votes = $1 WHERE article_id = $2 RETURNING *;`,
                 [updatedVotes, article_id]
             );
+        }).then((result) => {
+            return  result.rows[0]
         });
 };
 

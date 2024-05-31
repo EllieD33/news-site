@@ -20,8 +20,7 @@ exports.getComments = (req, res, next) => {
     const { limit } = req.query;
     const page = parseInt(req.query.page) || 1;
 
-    fetchComments(article_id, limit, page).then((result) => {
-        const comments = result
+    fetchComments(article_id, limit, page).then((comments) => {
         res.status(200).send({ comments });
     }).catch(next);
 }
@@ -30,8 +29,7 @@ exports.addComment = (req, res, next) => {
     const { article_id } = req.params;
     const { username, body } = req.body;
 
-    insertComment(article_id, username, body).then((result) => {
-        const comment = result.rows[0]
+    insertComment(article_id, username, body).then((comment) => {
         res.status(201).send({ comment });
     }).catch(next);
 }
@@ -40,8 +38,7 @@ exports.updateArticle = (req, res, next) => {
     const { article_id } = req.params;
     const {inc_votes: votes} = req.body;
 
-    updateArticleVotes(article_id, votes).then((result) => {
-        const article = result.rows[0]
+    updateArticleVotes(article_id, votes).then((article) => {
         res.status(200).send({ article });
     }).catch(next);
 }
