@@ -95,6 +95,9 @@
             }
         }
     },
+    "DELETE /api/articles/:article_id": {
+        "description": "deletes article by provided id"
+    },
     "GET /api/articles/:article_id/comments": {
         "description": "serves an object containing comments from specified article. Accepts pagination limits of: 5, 10, 20, 50, 100, 250",
         "queries": ["limit", "page"],
