@@ -503,6 +503,32 @@ describe('/api/articles/:article_id/comments', () => {
                 expect(response.body.msg).toBe("Bad request");
             });
     })
+    describe('/api/article/:article_id/comments pagination queries', () => {
+        test('GET:200 limits responses to specified number of results per page', () => {
+            return request(app)
+            .get('/api/articles/1/comments?limit=5')
+            .expect(200)
+            .then((response) => {
+                expect(response.body.comments.length).toBe(5)
+            })
+        });
+        test('GET:400 responds with error if invalid pagination limit provided', () => {
+            return request(app)
+            .get('/api/articles/1/comments?limit=7')
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe('Bad request')
+            })
+        });
+        test('GET:200 goes to specified page of results', () => {
+            return request(app)
+            .get('/api/articles/1/comments?limit=5&page=2')
+            .expect(200)
+            .then((response) => {
+                expect(response.body.comments.length).toBe(5)
+            });
+        });
+    });
 });
 
 describe('/api/comments/:comment_id', () => {

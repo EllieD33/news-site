@@ -19,7 +19,10 @@ exports.getArticles = (req, res, next) => {
 
 exports.getComments = (req, res, next) => {
     const id = req.params.article_id;
-    fetchComments(id).then((result) => {
+    const limit = req.query.limit;
+    const page = parseInt(req.query.page) || 1;
+
+    fetchComments(id, limit, page).then((result) => {
         const comments = result
         res.status(200).send({ comments });
     }).catch(next);

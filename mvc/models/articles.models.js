@@ -128,19 +128,33 @@ exports.fetchArticles = (topic, sortBy, order, pageLimit, page) => {
     }
 };
 
-exports.fetchComments = (id) => {
+exports.fetchComments = (id, pageLimit, page) => {
     if (isNaN(id)) {
         return Promise.reject({
             status: 400,
             msg: "Bad request",
         });
     }
+    const queryValues = []
 
+    const validPaginations = [5, 10, 20, 50, 100, 250]
+    let limit = 10
+
+    if(pageLimit && validPaginations.includes(parseInt(pageLimit))) {
+        limit = parseInt(pageLimit)
+    } else if (pageLimit && !validPaginations.includes(parseInt(pageLimit))) {
+        return Promise.reject({ status: 400, msg: "Bad request" })
+    }
+
+    const offset = (page - 1) * limit;
     return exports
         .checkExists("articles", "article_id", id)
         .then(() => {
-            const selectQuery = `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC`;
-            return db.query(selectQuery, [id]);
+            queryValues.push(id)
+            let selectQuery = `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC`;
+            selectQuery += ` LIMIT $${queryValues.length + 1} OFFSET $${queryValues.length + 2}`
+            queryValues.push(limit, offset);
+            return db.query(selectQuery, queryValues);
         })
         .then((result) => {
             if (result.rows.length === 0) {
