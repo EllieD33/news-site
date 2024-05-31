@@ -306,3 +306,9 @@ exports.postArticle = (author, title, body, topic, image) => {
             return exports.fetchArticleById(id);
         });
 };
+
+exports.removeArticle = (id) => {
+    return exports.checkExists('articles', 'article_id', id).then(() => {
+        return db.query(`DELETE FROM articles WHERE article_id = $1`, [id])
+    })
+}

@@ -178,6 +178,27 @@ describe('/api/articles/:article_id', () => {
             expect(response.body.msg).toBe('Bad request')
         })
     });
+    test('DELETE:204 deletes specified body and responds 204 with no body', () => {
+        return request(app)
+            .delete('/api/articles/7')
+            .expect(204)
+    });
+    test('DELETE:404 responds with an error if given article doesnt exist', () => {
+        return request(app)
+            .delete('/api/articles/7777')
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe('Not found');
+            })
+    });
+    test('DELETE:400 responds with an error invalid id provided', () => {
+        return request(app)
+            .delete('/api/articles/twenty')
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe('Bad request');
+            })
+    });
 });
 
 describe('/api/articles', () => {
