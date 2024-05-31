@@ -10,8 +10,8 @@ exports.checkExists = (table, column, value) => {
     });
 };
 
-exports.fetchArticleById = (article_id) => {
-    if (isNaN(article_id)) {
+exports.fetchArticleById = (articleId) => {
+    if (isNaN(articleId)) {
         return Promise.reject({ status: 400, msg: "Bad request" });
     }
 
@@ -31,9 +31,9 @@ exports.fetchArticleById = (article_id) => {
     GROUP BY articles.article_id;`;
 
     return exports
-        .checkExists("articles", "article_id", article_id)
+        .checkExists("articles", "article_id", articleId)
         .then(() => {
-            return db.query(selectQuery, [article_id]);
+            return db.query(selectQuery, [articleId]);
         })
         .then((result) => {
             const article = { ...result.rows[0] }
@@ -124,8 +124,8 @@ exports.fetchArticles = (topic, sortBy, order, pageLimit, page) => {
     }
 };
 
-exports.fetchComments = (article_id, pageLimit, page) => {
-    if (isNaN(article_id)) {
+exports.fetchComments = (articleId, pageLimit, page) => {
+    if (isNaN(articleId)) {
         return Promise.reject({ status: 400, msg: "Bad request" });
     }
 
@@ -137,10 +137,10 @@ exports.fetchComments = (article_id, pageLimit, page) => {
 
     const limit = pageLimit ? parseInt(pageLimit) : 10;
     const offset = (page - 1) * limit;
-    const queryValues = [article_id]
+    const queryValues = [articleId]
 
     return exports
-        .checkExists("articles", "article_id", article_id)
+        .checkExists("articles", "article_id", articleId)
         .then(() => {
             const selectQuery = `SELECT * FROM comments 
                 WHERE article_id = $1 
@@ -152,17 +152,17 @@ exports.fetchComments = (article_id, pageLimit, page) => {
         .then((result) => (result.rows.length === 0) ? [] : result.rows);
 };
 
-exports.insertComment = (article_id, author, body) => {
-    if (!article_id || !author || !body) {
+exports.insertComment = (articleId, author, body) => {
+    if (!articleId || !author || !body) {
         return Promise.reject({ status: 400, msg: "Bad request" });
     }
 
-    return exports.checkExists("articles", "article_id", article_id)
+    return exports.checkExists("articles", "article_id", articleId)
         .then(() => {
             return exports.checkExists("users", "username", author);
         })
         .then(() => {
-            const formattedComment = [article_id, author, body];
+            const formattedComment = [articleId, author, body];
             const insertQuery = `INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3) RETURNING *;`;
             return db.query(insertQuery, formattedComment);
         }).then((result) => {
@@ -170,54 +170,54 @@ exports.insertComment = (article_id, author, body) => {
         });
 };
 
-exports.updateArticleVotes = (article_id, votes) => {
-    if (!article_id || !votes) {
+exports.updateArticleVotes = (articleId, votes) => {
+    if (!articleId || !votes) {
         return Promise.reject({ status: 400, msg: "Bad request" });
     }
 
     return exports
-        .checkExists("articles", "article_id", article_id)
+        .checkExists("articles", "article_id", articleId)
         .then(() => {
             return db.query(
                 `SELECT votes FROM articles WHERE article_id = $1`,
-                [article_id]
+                [articleId]
             );
         })
         .then((result) => {
             const updatedVotes = result.rows[0].votes + votes;
             return db.query(
                 `UPDATE articles SET votes = $1 WHERE article_id = $2 RETURNING *;`,
-                [updatedVotes, article_id]
+                [updatedVotes, articleId]
             );
         }).then((result) => {
             return  result.rows[0]
         });
 };
 
-exports.removeComment = (comment_id) => {
-    if (!comment_id) {
+exports.removeComment = (commentId) => {
+    if (!commentId) {
         return Promise.reject({ status: 400, msg: "Bad request" });
     }
 
     return exports
-        .checkExists("comments", "comment_id", comment_id)
+        .checkExists("comments", "comment_id", commentId)
         .then(() => {
             return db.query(`DELETE FROM comments WHERE comment_id = $1`, [
-                comment_id,
+                commentId,
             ]);
         });
 };
 
-exports.updateCommentVotes = (comment_id, votes) => {
-    if (!comment_id || !votes) {
+exports.updateCommentVotes = (commentId, votes) => {
+    if (!commentId || !votes) {
         return Promise.reject({ status: 400, msg: "Bad request" });
     }
 
-    return exports.checkExists("comments", "comment_id", comment_id)
+    return exports.checkExists("comments", "comment_id", commentId)
         .then(() => {
             return db.query(
                 `SELECT votes FROM comments WHERE comment_id = $1`,
-                [comment_id]
+                [commentId]
             );
         })
         .then((result) => {
@@ -225,7 +225,7 @@ exports.updateCommentVotes = (comment_id, votes) => {
             return db
                 .query(
                     `UPDATE comments SET votes = $1 WHERE comment_id = $2 RETURNING *;`,
-                    [updatedVotes, comment_id]
+                    [updatedVotes, commentId]
                 )
                 .then((result) => {
                     return result.rows[0];
@@ -276,11 +276,11 @@ exports.postArticle = (author, title, body, topic, image) => {
         });
 };
 
-exports.removeArticle = (article_id) => {
-    if (!article_id) {
+exports.removeArticle = (articleId) => {
+    if (!articleId) {
         return Promise.reject({ status: 400, msg: "Bad request" });
     }
-    return exports.checkExists('articles', 'article_id', article_id).then(() => {
-        return db.query(`DELETE FROM articles WHERE article_id = $1`, [article_id])
+    return exports.checkExists('articles', 'article_id', articleId).then(() => {
+        return db.query(`DELETE FROM articles WHERE article_id = $1`, [articleId])
     })
 }
