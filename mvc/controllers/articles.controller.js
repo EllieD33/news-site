@@ -57,9 +57,9 @@ exports.deleteComment = (req, res, next) => {
 }
 
 exports.updateComment = (req, res, next) => {
-    const id = req.params.comment_id;
-    const votes = req.body.inc_votes;
-    updateCommentVotes(id, votes).then((comment) => {
+    const { comment_id } = req.params;
+    const { inc_votes: votes }= req.body;
+    updateCommentVotes(comment_id, votes).then((comment) => {
         res.status(200).send({ comment });
     }).catch(next);
 }
