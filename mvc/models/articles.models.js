@@ -1,4 +1,3 @@
-const { agent } = require("supertest");
 const db = require("../../db/connection");
 const format = require("pg-format");
 
@@ -183,9 +182,7 @@ exports.insertComment = (article_id, author, body) => {
         })
         .then(() => {
             const formattedComment = [article_id, author, body];
-            const insertQuery = format(
-                `INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3) RETURNING *;`
-            );
+            const insertQuery = `INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3) RETURNING *;`;
             return db.query(insertQuery, formattedComment);
         }).then((result) => {
             return result.rows[0]
@@ -283,9 +280,9 @@ exports.postArticle = (author, title, body, topic, image) => {
     }
 
     let formattedArticle = [author, title, body, topic];
-    let insertQuery = format(`INSERT INTO articles 
+    let insertQuery = `INSERT INTO articles 
     (author, title, body, topic)
-    VALUES ($1, $2, $3, $4) RETURNING *;`);
+    VALUES ($1, $2, $3, $4) RETURNING *;`;
 
     if (image) {
         if (typeof image !== 'string') {
