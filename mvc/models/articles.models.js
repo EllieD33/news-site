@@ -304,6 +304,10 @@ exports.postArticle = (author, title, body, topic, image) => {
         .then((result) => {
             const id = result.rows[0].article_id;
             return exports.fetchArticleById(id);
+        }).then((result) => {
+            const article = {...result}
+            article.comment_count = Number(article.comment_count)
+            return article
         });
 };
 

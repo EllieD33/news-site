@@ -70,9 +70,7 @@ exports.addArticle = (req, res, next) => {
     text = req.body.body;
     topic = req.body.topic;
     image = req.body.article_img_url;
-    postArticle(author, title, text, topic, image).then((result) => {
-        const article = {...result}
-        article.comment_count = Number(article.comment_count)
+    postArticle(author, title, text, topic, image).then((article) => {        
         res.status(201).send({ article })
     }).catch(next)
 }
