@@ -1,8 +1,7 @@
 const { selectTopics, postNewTopic } = require('../models/topics.models')
 
 exports.getAllTopics = (req, res, next) => {
-    selectTopics().then((result) => {
-        topics = result.rows
+    selectTopics().then((topics) => {
         res.status(200).send({ topics })
     }).catch(next)
 }
