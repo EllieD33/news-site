@@ -308,6 +308,12 @@ exports.postArticle = (author, title, body, topic, image) => {
 };
 
 exports.removeArticle = (id) => {
+    if (!id) {
+        return Promise.reject({
+            status: 400,
+            msg: "Bad request",
+        });
+    }
     return exports.checkExists('articles', 'article_id', id).then(() => {
         return db.query(`DELETE FROM articles WHERE article_id = $1`, [id])
     })
