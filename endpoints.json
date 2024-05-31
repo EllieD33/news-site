@@ -10,7 +10,7 @@
         }
     },
     "GET /api/articles": {
-        "description": "serves an array of all articles. Accepts pagination limits of: 5, 10, 20, 50, 100, 250.",
+        "description": "serves an array of all articles. Accepts pagination limits of: 5, 10, 20, 50, 100, 250. Served object includes a key indicating total number of articles in the array.",
         "queries": ["author", "topic", "sort_by", "order", "limit", "page"],
         "exampleResponse": {
             "articles": [
