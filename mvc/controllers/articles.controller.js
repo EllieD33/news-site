@@ -1,8 +1,8 @@
 const { fetchArticleById, fetchArticles, fetchComments, insertComment, updateArticleVotes, removeComment, updateCommentVotes, postArticle, removeArticle } = require('../models/articles.models')
 
 exports.getArticleById = (req, res, next) => {
-    const id = req.params.article_id
-    fetchArticleById(id).then((result) => {
+    const { article_id } = req.params;
+    fetchArticleById(article_id).then((result) => {
         const article = {...result}
         article.comment_count = Number(article.comment_count)
         res.status(200).send({ article });
@@ -10,7 +10,7 @@ exports.getArticleById = (req, res, next) => {
 }
 
 exports.getArticles = (req, res, next) => {
-    const { topic, sort_by, order, limit } = req.query
+    const { topic, sort_by, order, limit } = req.query;
     const page = parseInt(req.query.page) || 1;
     fetchArticles(topic, sort_by, order, limit, page).then((articles) => {
         res.status(200).send(articles);
@@ -18,40 +18,39 @@ exports.getArticles = (req, res, next) => {
 }
 
 exports.getComments = (req, res, next) => {
-    const id = req.params.article_id;
-    const limit = req.query.limit;
+    const { article_id } = req.params;
+    const { limit } = req.query;
     const page = parseInt(req.query.page) || 1;
 
-    fetchComments(id, limit, page).then((result) => {
+    fetchComments(article_id, limit, page).then((result) => {
         const comments = result
         res.status(200).send({ comments });
     }).catch(next);
 }
 
 exports.addComment = (req, res, next) => {
-    const id = req.params.article_id;
-    const username = req.body.username;
-    const comment = req.body.body;
+    const { article_id } = req.params;
+    const { username, body } = req.body;
 
-    insertComment(id, username, comment).then((result) => {
+    insertComment(article_id, username, body).then((result) => {
         const comment = result.rows[0]
         res.status(201).send({ comment });
     }).catch(next);
 }
 
 exports.updateArticle = (req, res, next) => {
-    const id = req.params.article_id;
-    const votes = req.body.inc_votes;
+    const { article_id } = req.params;
+    const {inc_votes: votes} = req.body;
 
-    updateArticleVotes(id, votes).then((result) => {
+    updateArticleVotes(article_id, votes).then((result) => {
         const article = result.rows[0]
         res.status(200).send({ article });
     }).catch(next);
 }
 
 exports.deleteComment = (req, res, next) => {
-    const id = req.params.comment_id
-    removeComment(id).then(() => {
+    const { comment_id } = req.params;
+    removeComment(comment_id).then(() => {
         res.status(204).send()
     }).catch(next);
 }
