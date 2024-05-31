@@ -3,8 +3,8 @@ const format = require("pg-format");
 
 exports.checkExists = (table, column, value) => {
     const queryStr = format("SELECT * FROM %I WHERE %I = $1;", table, column);
-    return db.query(queryStr, [value]).then((dbOutput) => {
-        if (dbOutput.rows.length === 0) {
+    return db.query(queryStr, [value]).then((result) => {
+        if (result.rows.length === 0) {
             return Promise.reject({ status: 404, msg: "Not found" });
         }
     });
@@ -32,7 +32,7 @@ exports.fetchArticleById = (id) => {
             return db.query(selectQuery, [id]);
         })
         .then((result) => {
-            const article = {...result.rows[0]}
+            const article = { ...result.rows[0] }
             article.comment_count = Number(article.comment_count)
             return article;
         });
@@ -50,37 +50,31 @@ exports.fetchArticles = (topic, sortBy, order, pageLimit, page) => {
         COUNT(comments.comment_id) AS comment_count 
     FROM articles
     LEFT JOIN comments ON articles.article_id = comments.article_id`;
+
     const queryValues = [];
 
     const validSorts = ["author", "title", "topic", "votes", "comment_count"];
     const validOrders = ["ASC", "DESC"];
+    const validPaginations = [5, 10, 20, 50, 100, 250];
 
-    let sortStr = " ORDER BY created_at";
-    let orderStr = " DESC";
-
-    if (order && validOrders.includes(order.toUpperCase())) {
-        orderStr = " " + order.toUpperCase();
-    } else if (order && !validOrders.includes(order.toUpperCase())) {
+    if (order && !validOrders.includes(order.toUpperCase())) {
         return Promise.reject({ status: 400, msg: "Bad request" });
     }
 
-    if (sortBy && validSorts.includes(sortBy)) {
-        sortStr = " ORDER BY " + sortBy;
-    } else if (sortBy && !validSorts.includes(sortBy)) {
+    if (sortBy && !validSorts.includes(sortBy)) {
         return Promise.reject({ status: 400, msg: "Bad request" });
     }
-    
+
+    if (pageLimit && !validPaginations.includes(parseInt(pageLimit))) {
+        return Promise.reject({ status: 400, msg: "Bad request" });
+    }
+
+    const sortStr = sortBy ? ` ORDER BY ${sortBy}` : " ORDER BY created_at";
+    const orderStr = order ? ` ${order.toUpperCase()}` : " DESC";
     const sortQuery = sortStr + orderStr;
-
-    const validPaginations = [5, 10, 20, 50, 100, 250]
-    let limit = 10
-    if(pageLimit && validPaginations.includes(parseInt(pageLimit))) {
-            limit = parseInt(pageLimit)
-        } else if (pageLimit && !validPaginations.includes(parseInt(pageLimit))) {
-            return Promise.reject({ status: 400, msg: "Bad request" })
-        }
-
+    const limit = pageLimit ? parseInt(pageLimit) : 10;
     const offset = (page - 1) * limit;
+
     let paginationStr = ` LIMIT $${queryValues.length + 1} OFFSET $${queryValues.length + 2}`;
 
     if (topic) {
