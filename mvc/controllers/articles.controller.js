@@ -65,12 +65,8 @@ exports.updateComment = (req, res, next) => {
 }
 
 exports.addArticle = (req, res, next) => {
-    author = req.body.author;
-    title = req.body.title;
-    text = req.body.body;
-    topic = req.body.topic;
-    image = req.body.article_img_url;
-    postArticle(author, title, text, topic, image).then((article) => {        
+    const { author, title, body, topic, article_img_url } = req.body
+    postArticle(author, title, body, topic, article_img_url).then((article) => {        
         res.status(201).send({ article })
     }).catch(next)
 }
