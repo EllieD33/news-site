@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const { handleBadRequest, handleErrorMessage, handleServerError } = require('./error-handler')
 
 const apiRouter = require('./routes/api.router');
@@ -8,6 +9,8 @@ const commentsRouter = require('./routes/comments.router');
 const usersRouter = require('./routes/users.router');
 
 const app = express();
+
+app.use(cors());
 
 app.use(express.json());
 
