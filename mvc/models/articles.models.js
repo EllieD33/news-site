@@ -57,7 +57,7 @@ exports.fetchArticles = (topic, sortBy, order, pageLimit, page) => {
 
     const queryValues = [];
 
-    const validSorts = ["author", "title", "topic", "votes", "comment_count"];
+    const validSorts = ["author", "title", "topic", "votes", "comment_count", "created_at"];
     const validOrders = ["ASC", "DESC"];
     const validPaginations = [5, 10, 20, 50, 100, 250];
 
