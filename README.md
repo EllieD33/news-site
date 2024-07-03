@@ -6,6 +6,8 @@ Welcome to my Northcoders News API, a RESTful service inspired by the functional
 ## Demo
 The API is hosted using Supabase and Render here: https://news-site-qstq.onrender.com
 
+It may take a while for the API to connect initially - please be patient :) 
+
 ### Overview of endpoints
 GET /api
 
